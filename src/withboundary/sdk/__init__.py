@@ -11,6 +11,7 @@ without reaching into private modules.
 
 __version__ = "0.0.0"
 
+from .capture import apply_capture
 from .config import (
     REDACT,
     BatchOptions,
@@ -29,6 +30,7 @@ from .events import (
     SdkMeta,
 )
 from .identifiers import mint_event_id, mint_run_id
+from .redact import apply_redaction
 from .runs import PerRunRegistry, PerRunState
 
 __all__ = [
@@ -47,6 +49,8 @@ __all__ = [
     "RetryOptions",
     "SdkMeta",
     "__version__",
+    "apply_capture",
+    "apply_redaction",
     "make_redaction",
     "mint_event_id",
     "mint_run_id",
