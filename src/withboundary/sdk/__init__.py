@@ -20,15 +20,32 @@ from .config import (
     RetryOptions,
     make_redaction,
 )
+from .events import (
+    AcceptedEvent,
+    BoundaryEvent,
+    EventBuilder,
+    FailedEvent,
+    ResolvedCapture,
+    SdkMeta,
+)
 from .identifiers import mint_event_id, mint_run_id
+from .runs import PerRunRegistry, PerRunState
 
 __all__ = [
     "REDACT",
+    "AcceptedEvent",
     "BatchOptions",
+    "BoundaryEvent",
     "BreakerOptions",
     "CapturePolicy",
+    "EventBuilder",
+    "FailedEvent",
+    "PerRunRegistry",
+    "PerRunState",
     "RedactionOptions",
+    "ResolvedCapture",
     "RetryOptions",
+    "SdkMeta",
     "__version__",
     "make_redaction",
     "mint_event_id",
