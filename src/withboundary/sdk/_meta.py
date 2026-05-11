@@ -15,6 +15,8 @@ import platform
 
 from . import __version__
 
+__all__ = ["SDK_NAME", "__version__", "runtime", "user_agent"]
+
 SDK_NAME = "withboundary-sdk-python"
 """Stable identifier for this distribution. Sent verbatim in the ``sdk.name``
 field on every event so dashboard rollups can split traffic by client SDK."""
