@@ -1,24 +1,22 @@
-"""Public factory for the synchronous Boundary logger.
+"""Public factories for the Boundary loggers.
 
-The factory takes a wide kwarg surface so users only specify the
+Each factory takes a wide kwarg surface so users only specify the
 options they care about; everything else falls back to sensible
-defaults. Returns ``None`` when neither an API key nor a custom
+defaults. Both return ``None`` when neither an API key nor a custom
 ``write`` sink is configured — the dev-mode safe path. Callers can
-wire the factory unconditionally and still get a no-op in
+wire the factories unconditionally and still get a no-op in
 unconfigured environments.
-
-The async sibling factory (``create_async_boundary_logger``) lands
-in a follow-up phase alongside the async logger.
 """
 
 from __future__ import annotations
 
 import os
-from collections.abc import Callable
+from collections.abc import Awaitable, Callable
 
 import httpx
 
 from ._meta import __version__
+from .batcher.async_ import AsyncBatcher
 from .batcher.sync import SyncBatcher
 from .config import (
     BatchOptions,
@@ -29,7 +27,9 @@ from .config import (
 )
 from .events import BoundaryEvent, EventBuilder
 from .lifecycle import register_atexit
+from .logger.async_ import AsyncBoundaryLogger
 from .logger.sync import SyncBoundaryLogger
+from .transport.async_ import AsyncIngestTransport
 from .transport.sync import SyncIngestTransport
 
 DEFAULT_ENDPOINT = "https://api.withboundary.com"
@@ -144,8 +144,87 @@ def create_boundary_logger(
     return logger
 
 
+def create_async_boundary_logger(
+    *,
+    api_key: str | None = None,
+    environment: str | None = None,
+    model: str | None = None,
+    endpoint: str = DEFAULT_ENDPOINT,
+    batch: BatchOptions | None = None,
+    capture: CapturePolicy | None = None,
+    redact: RedactionOptions | None = None,
+    retry: RetryOptions | None = None,
+    breaker: BreakerOptions | None = None,
+    before_send: Callable[[BoundaryEvent], BoundaryEvent | None]
+    | Callable[[BoundaryEvent], Awaitable[BoundaryEvent | None]]
+    | None = None,
+    write: Callable[[list[BoundaryEvent]], None]
+    | Callable[[list[BoundaryEvent]], Awaitable[None]]
+    | None = None,
+    flush_on_exit: bool = True,
+    on_error: Callable[[Exception], None] | None = None,
+    http_client: httpx.AsyncClient | None = None,
+) -> AsyncBoundaryLogger | None:
+    """Build an asyncio-native ``ContractLogger`` ready to plug into
+    ``define_contract(logger=...).aaccept(...)``.
+
+    Returns ``None`` when neither ``api_key`` (or the
+    ``BOUNDARY_API_KEY`` env var) nor a custom ``write`` sink is
+    configured.
+
+    The kwargs mirror :func:`create_boundary_logger` with two
+    asyncio-specific accommodations: ``write`` and ``before_send`` may
+    return awaitables (the batcher awaits them when they do), and
+    ``http_client`` accepts an :class:`httpx.AsyncClient`.
+
+    ``flush_on_exit`` is accepted for symmetry but is a no-op: an
+    ``atexit`` handler running after the loop has closed can't await
+    a coroutine. Async users call ``await logger.shutdown(...)`` from
+    their framework's shutdown event (FastAPI ``on_event("shutdown")``,
+    Litestar lifespan, etc.).
+    """
+    del flush_on_exit  # accepted for parity with the sync factory
+
+    resolved_key = api_key or os.environ.get(API_KEY_ENV_VAR)
+
+    if not resolved_key and write is None:
+        return None
+
+    transport: AsyncIngestTransport | None = None
+    if resolved_key:
+        transport = AsyncIngestTransport(
+            endpoint=endpoint,
+            api_key=resolved_key,
+            retry=retry,
+            breaker=breaker,
+            client=http_client,
+        )
+
+    batcher = AsyncBatcher(
+        transport=transport,
+        options=batch,
+        write=write,
+        before_send=before_send,
+        on_error=on_error,
+    )
+
+    builder = EventBuilder(
+        sdk_version=__version__,
+        environment=environment,
+        default_model=model,
+    )
+
+    return AsyncBoundaryLogger(
+        batcher=batcher,
+        builder=builder,
+        capture=capture,
+        redact=redact,
+    )
+
+
 __all__ = [
     "API_KEY_ENV_VAR",
     "DEFAULT_ENDPOINT",
+    "create_async_boundary_logger",
     "create_boundary_logger",
 ]

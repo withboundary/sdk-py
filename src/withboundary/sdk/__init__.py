@@ -30,9 +30,9 @@ from .events import (
     ResolvedCapture,
     SdkMeta,
 )
-from .factory import create_boundary_logger
+from .factory import create_async_boundary_logger, create_boundary_logger
 from .identifiers import mint_event_id, mint_run_id
-from .logger import SyncBoundaryLogger
+from .logger import AsyncBoundaryLogger, SyncBoundaryLogger
 from .queue import AsyncEventQueue, EventQueue, SyncEventQueue
 from .redact import apply_redaction
 from .runs import PerRunRegistry, PerRunState
@@ -53,6 +53,7 @@ __all__ = [
     "REDACT",
     "AcceptedEvent",
     "AsyncBatcher",
+    "AsyncBoundaryLogger",
     "AsyncEventQueue",
     "AsyncIngestTransport",
     "AuthError",
@@ -83,6 +84,7 @@ __all__ = [
     "__version__",
     "apply_capture",
     "apply_redaction",
+    "create_async_boundary_logger",
     "create_boundary_logger",
     "make_redaction",
     "mint_event_id",
