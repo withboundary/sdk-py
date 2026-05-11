@@ -11,6 +11,7 @@ without reaching into private modules.
 
 __version__ = "0.0.0"
 
+from .batcher import AsyncBatcher, SyncBatcher
 from .capture import apply_capture
 from .config import (
     REDACT,
@@ -49,6 +50,7 @@ from .transport.sync import SyncIngestTransport
 __all__ = [
     "REDACT",
     "AcceptedEvent",
+    "AsyncBatcher",
     "AsyncEventQueue",
     "AsyncIngestTransport",
     "AuthError",
@@ -71,6 +73,7 @@ __all__ = [
     "ResolvedCapture",
     "RetryOptions",
     "SdkMeta",
+    "SyncBatcher",
     "SyncEventQueue",
     "SyncIngestTransport",
     "TransportError",
