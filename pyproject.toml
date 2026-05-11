@@ -113,12 +113,6 @@ init_forbid_extra = false
 init_typed = true
 warn_required_dynamic_aliases = false
 
-[[tool.mypy.overrides]]
-# The contract package ships untyped at the moment — once it adds a
-# py.typed marker the override comes off in the next dependency bump.
-module = "withboundary.contract.*"
-ignore_missing_imports = true
-
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 asyncio_mode = "auto"
