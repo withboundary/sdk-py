@@ -30,24 +30,50 @@ from .events import (
     SdkMeta,
 )
 from .identifiers import mint_event_id, mint_run_id
+from .queue import AsyncEventQueue, EventQueue, SyncEventQueue
 from .redact import apply_redaction
 from .runs import PerRunRegistry, PerRunState
+from .transport import (
+    AuthError,
+    BreakerOpenError,
+    BreakerState,
+    CircuitBreaker,
+    IngestError,
+    NonRetryableStatusError,
+    RateLimitError,
+    TransportError,
+)
+from .transport.async_ import AsyncIngestTransport
+from .transport.sync import SyncIngestTransport
 
 __all__ = [
     "REDACT",
     "AcceptedEvent",
+    "AsyncEventQueue",
+    "AsyncIngestTransport",
+    "AuthError",
     "BatchOptions",
     "BoundaryEvent",
+    "BreakerOpenError",
     "BreakerOptions",
+    "BreakerState",
     "CapturePolicy",
+    "CircuitBreaker",
     "EventBuilder",
+    "EventQueue",
     "FailedEvent",
+    "IngestError",
+    "NonRetryableStatusError",
     "PerRunRegistry",
     "PerRunState",
+    "RateLimitError",
     "RedactionOptions",
     "ResolvedCapture",
     "RetryOptions",
     "SdkMeta",
+    "SyncEventQueue",
+    "SyncIngestTransport",
+    "TransportError",
     "__version__",
     "apply_capture",
     "apply_redaction",
