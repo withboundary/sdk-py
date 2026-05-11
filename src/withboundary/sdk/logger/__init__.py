@@ -20,8 +20,10 @@ Returning ``None`` from the factory is the dev-mode safe path.
 
 from __future__ import annotations
 
+from .async_ import AsyncBoundaryLogger
 from .sync import SyncBoundaryLogger
 
 __all__ = [
+    "AsyncBoundaryLogger",
     "SyncBoundaryLogger",
 ]
