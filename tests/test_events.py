@@ -274,11 +274,13 @@ class TestSdkMeta:
 
 
 class TestNowIso:
-    def test_includes_timezone_offset(self) -> None:
-        # ISO 8601 + UTC offset; the validator parses with z.iso.datetime
-        # which requires the timezone designator.
+    def test_uses_z_utc_designator(self) -> None:
+        # Hosted ingest validates timestamps with z.iso.datetime(), whose
+        # default form only accepts the `Z` UTC literal — a numeric
+        # `+00:00` offset is rejected even though both mean UTC.
         ts = now_iso()
-        assert ts.endswith("+00:00")
+        assert ts.endswith("Z")
+        assert "+00:00" not in ts
 
 
 # ── EventBuilder ───────────────────────────────────────────────────────────
