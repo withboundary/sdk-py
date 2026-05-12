@@ -132,10 +132,11 @@ exclude_none=True)`` to produce the JSON the ingest endpoint accepts."""
 
 
 def now_iso() -> str:
-    """Current wall-clock time as an ISO 8601 string with explicit
-    UTC offset. Used as the ``timestamp`` field on every event the
-    SDK builds."""
-    return datetime.now(timezone.utc).isoformat()
+    """Current wall-clock time as an ISO 8601 string with the ``Z``
+    UTC designator. The hosted ingest validator's datetime check only
+    accepts the ``Z`` literal — a numeric ``+00:00`` offset is rejected
+    at the wire-validation step, even though both denote UTC."""
+    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
 
 
 def sdk_meta(version: str) -> SdkMeta:
